@@ -7,7 +7,7 @@ Created on Sat Oct 31 17:20:29 2020
 import numpy as np
 import pandas as pd
 
-oos = pd.read_csv('July_2020_OOS.csv')
+oos = pd.read_csv('July_2019_OOS.csv')
 
 oos["Date"] = pd.to_datetime(oos["Date"])
 
@@ -68,7 +68,7 @@ for i in machineid :
         oosmean = oosmean.append(gc_row, ignore_index=True)
 
 oosmean = oosmean.dropna(axis=0)
-oosmean.to_csv("Grangers_2020_OOS_l4.csv")
+oosmean.to_csv("Grangers_2019_OOS_l4.csv")
 
 # oosg = pd.read_csv('Grangers_2020_OOS.csv')
 # oosg.columns
