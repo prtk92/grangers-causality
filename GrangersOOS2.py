@@ -28,9 +28,16 @@ from statsmodels.tsa.stattools import grangercausalitytests
 # gc_res[1][0]['params_ftest'][1]
     
 machineid = oos["Machine_ID"].unique()
-oosmean = pd.DataFrame(columns=['Machine_ID','Scratchers_Sales','Out_of_Stock__','Lagged_Correlation1','Lagged_Correlation2','Lagged_Correlation3','Lagged_Correlation4','ssr_chi2test1','ssr_chi2test2','ssr_chi2test3','ssr_chi2test4'])
+oosmean = pd.DataFrame(columns=['Machine_ID','Scratchers_Sales','Out_of_Stock__',
+                                'Retailer_ID', 'Terminal_ID', 'termType', 'Chain_ID',
+                                'TMID', 'Location_Name', 'Location_Address', 'Location_City', 'Zip',
+                                'Lagged_Correlation1','Lagged_Correlation2','Lagged_Correlation3','Lagged_Correlation4',
+                                'ssr_chi2test1','ssr_chi2test2','ssr_chi2test3','ssr_chi2test4'])
 for i in machineid :
-    oos_i = oos.sort_values("Date")[oos["Machine_ID"]==i][["Scratchers_Sales","Out_of_Stock__"]]
+    oos_i = oos.sort_values("Date")[oos["Machine_ID"]==i][["Scratchers_Sales","Out_of_Stock__",
+                                                           'Retailer_ID', 'Terminal_ID', 'termType', 'Chain_ID',
+                                                           'TMID', 'Location_Name', 'Location_Address', 'Location_City', 'Zip']]
+    oos_i = oos_i.reset_index()
     if((pd.isna(oos_i["Scratchers_Sales"].corr(oos_i["Out_of_Stock__"]))) or  oos_i["Scratchers_Sales"].corr(oos_i["Out_of_Stock__"]) == -1   or (oos_i.shape[0] < 30) or oos_i["Out_of_Stock__"].std() < 0.00000001):
         print(i,oos_i["Scratchers_Sales"].corr(oos_i["Out_of_Stock__"]),oos_i.shape[0],oos_i["Out_of_Stock__"].std(),"Error")
     else:
@@ -39,10 +46,19 @@ for i in machineid :
         lagcorr2 = oos_i["Scratchers_Sales"].corr(oos_i["Out_of_Stock__"].shift(periods=2))
         lagcorr3 = oos_i["Scratchers_Sales"].corr(oos_i["Out_of_Stock__"].shift(periods=3))
         lagcorr4 = oos_i["Scratchers_Sales"].corr(oos_i["Out_of_Stock__"].shift(periods=4))
-        gc_res = grangercausalitytests(oos_i, 4)
+        gc_res = grangercausalitytests(oos_i[["Scratchers_Sales","Out_of_Stock__"]], 4)
         gc_row = pd.Series([i,
                             oos_i["Scratchers_Sales"].mean(),
                             oos_i["Out_of_Stock__"].mean(),
+                            oos_i["Retailer_ID"][0],
+                            oos_i["Terminal_ID"][0],
+                            oos_i["termType"][0],
+                            oos_i["Chain_ID"][0],
+                            oos_i["TMID"][0],
+                            oos_i["Location_Name"][0],
+                            oos_i["Location_Address"][0],
+                            oos_i["Location_City"][0],
+                            oos_i["Zip"][0],
                             lagcorr1,lagcorr2,lagcorr3,lagcorr4,
                             gc_res[1][0]['ssr_chi2test'][1],
                             gc_res[2][0]['ssr_chi2test'][1],
